@@ -1,17 +1,16 @@
-package java.com.ssc;
+package java.com.ssc.activities;
 
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
-/**
- * Created by Kamal on 12/8/16.
- */
+import java.com.ssc.R;
 
-public class SignUpLoginActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
     }
 }

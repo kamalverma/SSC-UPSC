@@ -1,4 +1,4 @@
-package java.com.ssc;
+package java.com.ssc.activities;
 
 /**
  * Created by Kamal on 12/8/16.
