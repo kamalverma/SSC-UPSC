@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/SSC-UPSC.iml" filepath="$PROJECT_DIR$/SSC-UPSC.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/corelibrary/corelibrary.iml" filepath="$PROJECT_DIR$/corelibrary/corelibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/prepup/prepup.iml" filepath="$PROJECT_DIR$/prepup/prepup.iml" />
     </modules>
   </component>
 </project>
