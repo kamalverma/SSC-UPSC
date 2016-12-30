@@ -27,7 +27,7 @@ public class NetworkUtils {
 
     public enum Environment {
 
-        PROD("https", "www.ixigo.com", "edge.ixigo.com", "images.ixigo.com/node_image"),
+        PROD("https", "54.85.200.166", "edge.ixigo.com", "images.ixigo.com/node_image"),
         APP1("https", "app1.ixigo.com", "app1.ixigo.com", "www.ixigo.com/node_image"),
         BUILD1("http", "54.85.200.166", "54.85.200.166", "54.85.200.166"),
         BUILD4("https", "build4.ixigo.com", "build4.ixigo.com", "www.ixigo.com/node_image");
