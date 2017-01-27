@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.corelibrary.common.AppConstants;
 import com.corelibrary.fragments.ChooseSubjectFragment;
@@ -31,16 +32,13 @@ public class QuestionBySubjectActivity extends AppCompatActivity {
 
         int toolbarId = getResources().getIdentifier("toolbar", "id", getPackageName());
         Toolbar toolbar = (Toolbar) findViewById(toolbarId);
-
+        subject = (Subject) getIntent().getExtras().getSerializable(AppConstants.CATEGORY);
         if (toolbar != null) {
+            toolbar.setTitle(subject.getCatName());
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
-
-        subject = (Subject) getIntent().getExtras().getSerializable(AppConstants.CATEGORY);
-
-        toolbar.setTitle(subject.getCatName());
 
         QuestionFragment subjectFragment = QuestionFragment.getInstance(subject);
         getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, subjectFragment, ChooseSubjectFragment.TAG).commit();
@@ -52,6 +50,15 @@ public class QuestionBySubjectActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                super.onBackPressed();
+        }
+        return true;
     }
 
 }
