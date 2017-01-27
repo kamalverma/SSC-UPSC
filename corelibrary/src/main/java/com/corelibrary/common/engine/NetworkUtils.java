@@ -11,6 +11,8 @@ import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
 /**
  * Class to check network speed and more
  *
@@ -20,95 +22,29 @@ public class NetworkUtils {
 
     public static final String TAG = NetworkUtils.class.getSimpleName();
 
-    private static final int NOTIFICATION_ID = 5001;
-
     public static final Environment DEFAULT_ENVIRONMENT = Environment.BUILD1;
-    private static final String KEY_ENVIRONMENT = "KEY_ENVIRONMENT";
 
     public enum Environment {
 
-        PROD("https", "54.85.200.166", "edge.ixigo.com", "images.ixigo.com/node_image"),
-        APP1("https", "app1.ixigo.com", "app1.ixigo.com", "www.ixigo.com/node_image"),
-        BUILD1("http", "54.85.200.166", "54.85.200.166", "54.85.200.166"),
-        BUILD4("https", "build4.ixigo.com", "build4.ixigo.com", "www.ixigo.com/node_image");
-
-        private String scheme;
-        private String host;
-        private String edgeHost;
-        private String imageHost;
-
-        Environment(String scheme, String host, String edgeHost, String imageHost) {
-            this.scheme = scheme;
-            this.host = host;
-            this.edgeHost = edgeHost;
-            this.imageHost = imageHost;
-        }
-
-        public String getScheme() {
-            return scheme;
-        }
-
-        public String getHost() {
-            return host;
-        }
-
-        public String getEdgeHost() {
-            return edgeHost;
-        }
-
-        public String getImageHost() {
-            return imageHost;
-        }
-
-        public static Environment parseEnvironment(String environment) {
-            for (Environment env : values()) {
-                if (env.name().equalsIgnoreCase(environment)) {
-                    return env;
-                }
-            }
-            return null;
-        }
+        PROD,
+        BUILD1;
     }
 
     private static Environment environment = DEFAULT_ENVIRONMENT;
 
-    public static String getIxigoHost() {
-        return environment.getHost();
-    }
-
-    public static String getIxigoEdgeHost() {
-        return environment.getEdgeHost();
-    }
-
-    public static String getIxigoImageHost() {
-        return environment.getImageHost();
-    }
-
-    public static String getIxigoPrefixHost() {
-        return environment.getScheme() + "://" + environment.getHost();
-    }
-
-    public static String getIxigoPrefixEdgeHost() {
-        return environment.getScheme() + "://" + environment.getEdgeHost();
-    }
-
-    public static String getIxigoPrefixImageHost() {
-        return environment.getScheme() + "://" + environment.getImageHost();
-    }
-
-    public static void setEnvironment(Context context, Environment environment) {
-        if (Environment.PROD != environment) {
-            NetworkUtils.issueEnvironmentNotification(context, environment);
-        } else {
-            NetworkUtils.clearEnvironmentNotification(context);
+    public static String getDefaultBaseUrl() {
+        if (getEnvironment() == Environment.BUILD1) {
+            return FirebaseRemoteConfig.getInstance().getString("build_url");
+        } else if (getEnvironment() == Environment.PROD) {
+            return FirebaseRemoteConfig.getInstance().getString("prod_url");
         }
-        NetworkUtils.environment = environment;
+        return FirebaseRemoteConfig.getInstance().getString("prod_url");
     }
+
 
     public static Environment getEnvironment() {
         return environment;
     }
-
 
     /**
      * Get the network info
@@ -220,46 +156,5 @@ public class NetworkUtils {
         }
     }
 
-    public static void issueEnvironmentNotification(Context context, Environment environment) {
-
-        Intent intent = new Intent(context.getPackageName() + ".SWITCH_ENVIRONMENT");
-        intent.putExtra(KEY_ENVIRONMENT, Environment.PROD);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(context.getResources().getIdentifier("pw_notification", "drawable", context.getPackageName())).setAutoCancel(true)
-                .setContentTitle("Using " + environment.getHost()).setContentText("Tap to reset").setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pendingIntent);
-
-        Log.i(TAG, "Issuing notification for: " + environment.name());
-        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
-    }
-
-    public static void clearEnvironmentNotification(Context context) {
-        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotifyMgr.cancel(NOTIFICATION_ID);
-    }
-
-    public static class SwitchEnvironmentRequestReceiver extends BroadcastReceiver {
-
-        public static String TAG = SwitchEnvironmentRequestReceiver.class.getSimpleName();
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "onReceive");
-            Environment environment = null;
-            if (intent.hasExtra(KEY_ENVIRONMENT)) {
-                environment = (Environment) intent.getSerializableExtra(KEY_ENVIRONMENT);
-            } else if (intent.hasExtra("ENVIRONMENT")) {
-                environment = Environment.parseEnvironment(intent.getStringExtra("ENVIRONMENT"));
-            }
-
-            if (environment != null) {
-                NetworkUtils.setEnvironment(context, environment);
-            }
-        }
-
-    }
 
 }

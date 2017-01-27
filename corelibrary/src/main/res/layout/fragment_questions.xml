@@ -7,7 +7,7 @@
     android:padding="8dp">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_subjects"
+        android:id="@+id/rv_questions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical">

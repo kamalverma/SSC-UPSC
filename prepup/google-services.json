@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "16706607330",
+    "firebase_url": "https://prepup-bd991.firebaseio.com",
+    "project_id": "prepup-bd991",
+    "storage_bucket": "prepup-bd991.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16706607330:android:7b4130021235b844",
+        "android_client_info": {
+          "package_name": "com.prepup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "16706607330-4ima4negp5cifsqrjr0qpihtjghm9tqj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDScJoJltLc5-_OcJf7BEZhHE6o5VVT5no"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

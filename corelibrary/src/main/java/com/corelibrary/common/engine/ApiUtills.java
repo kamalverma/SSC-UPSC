@@ -1,9 +1,13 @@
 package com.corelibrary.common.engine;
 
+import com.corelibrary.models.QuestionResponse;
 import com.corelibrary.models.SubjectResponse;
 
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -13,4 +17,9 @@ import retrofit2.http.Query;
 public interface ApiUtills {
     @GET("/rest/v1/category/list")
     Call<SubjectResponse> getSubjectList(@Query("appId") String aapId);
+
+
+    @FormUrlEncoded
+    @POST("/rest/v1/questions")
+    Call<QuestionResponse> getQuestionList(@Field("cat_id") int catId);
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><!-- START xml_defaults -->
+<defaultsMap>
+    <entry>
+        <key>build_url</key>
+        <value>http://54.85.200.166</value>
+    </entry>
+    <entry>
+        <key>prod_url</key>
+        <value>http://54.85.200.166</value>
+    </entry>
+
+</defaultsMap>

@@ -14,7 +14,7 @@ public class RetrofitClient {
     public static Retrofit getClient() {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(NetworkUtils.getIxigoPrefixHost())
+                    .baseUrl(NetworkUtils.getDefaultBaseUrl())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }

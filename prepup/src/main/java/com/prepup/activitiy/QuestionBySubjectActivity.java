@@ -1,15 +1,14 @@
 package com.prepup.activitiy;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 
 import com.corelibrary.common.AppConstants;
 import com.corelibrary.fragments.ChooseSubjectFragment;
+import com.corelibrary.fragments.QuestionFragment;
 import com.corelibrary.models.Subject;
 import com.prepup.R;
 import com.prepup.fragments.HomePageFragment;
@@ -19,12 +18,15 @@ import com.prepup.fragments.HomePageFragment;
  * Created by Kamal on 12/8/16.
  */
 
-public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseSubjectFragment.CallBacks {
+public class QuestionBySubjectActivity extends AppCompatActivity {
+
+
+    private Subject subject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.act_choose_subject);
+        setContentView(R.layout.act_questions);
 
 
         int toolbarId = getResources().getIdentifier("toolbar", "id", getPackageName());
@@ -36,13 +38,12 @@ public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseS
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
-        ChooseSubjectFragment subjectFragment = ChooseSubjectFragment.getInstance();
+        subject = (Subject) getIntent().getExtras().getSerializable(AppConstants.CATEGORY);
+
+        toolbar.setTitle(subject.getCatName());
+
+        QuestionFragment subjectFragment = QuestionFragment.getInstance(subject);
         getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, subjectFragment, ChooseSubjectFragment.TAG).commit();
-
-
-        HomePageFragment homePageFragment = HomePageFragment.getInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fl_app_view, homePageFragment, HomePageFragment.TAG).commit();
-
     }
 
 
@@ -53,15 +54,4 @@ public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseS
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSubjectSelected(Subject subject) {
-        Intent intent = new Intent(this, QuestionBySubjectActivity.class);
-        intent.putExtra(AppConstants.CATEGORY, subject);
-        startActivity(intent);
-    }
 }
