@@ -55,7 +55,11 @@ public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseS
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                super.onBackPressed();
+        }
+        return true;
     }
 
     @Override

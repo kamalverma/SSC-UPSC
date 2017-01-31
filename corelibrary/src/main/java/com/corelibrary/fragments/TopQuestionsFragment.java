@@ -41,10 +41,10 @@ import retrofit2.Response;
  * Created by kamalverma on 25/12/16.
  */
 
-public class QuestionFragment extends Fragment {
+public class TopQuestionsFragment extends Fragment {
 
 
-    public static String TAG = QuestionFragment.class.getName();
+    public static String TAG = TopQuestionsFragment.class.getName();
 
     private QuestionAdapter mAdapter;
     private List<Question> listQuestions;
@@ -56,9 +56,9 @@ public class QuestionFragment extends Fragment {
     private DbQuestions dbQuestions;
 
 
-    public static QuestionFragment getInstance(Subject subject) {
+    public static TopQuestionsFragment getInstance(Subject subject) {
 
-        QuestionFragment fragment = new QuestionFragment();
+        TopQuestionsFragment fragment = new TopQuestionsFragment();
 
         Bundle bundle = new Bundle();
         bundle.putSerializable(AppConstants.CATEGORY, subject);
@@ -129,7 +129,7 @@ public class QuestionFragment extends Fragment {
 
             for (String option : listQuestions.get(position).getOpts()) {
                 RadioButton radioButtonView = new RadioButton(getActivity());
-                radioButtonView.setText(Html.fromHtml(option));
+                radioButtonView.setText(option);
                 holder.rgOptions.addView(radioButtonView);
             }
         }

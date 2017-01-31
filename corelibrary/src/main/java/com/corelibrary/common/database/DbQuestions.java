@@ -27,7 +27,7 @@ public class DbQuestions {
 
     public int create(Question question) {
         try {
-            if (getByCatId(question.getQuestionId()) == null) {
+            if (getByQuestionId(question.getQuestionId()) == null) {
                 return mQuestionDao.create(question);
             } else {
                 mQuestionDao.update(question);
@@ -56,7 +56,7 @@ public class DbQuestions {
         return 0;
     }
 
-    public Question getByCatId(int questionId) {
+    public Question getByQuestionId(int questionId) {
         try {
             QueryBuilder<Question, Integer> qb = mQuestionDao.queryBuilder();
 

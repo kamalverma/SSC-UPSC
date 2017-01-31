@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -77,9 +78,9 @@ public class ChooseSubjectFragment extends Fragment {
         RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_subjects);
         rvSubjects.setHasFixedSize(true);
 
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, 0);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
 
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        layoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
         rvSubjects.setLayoutManager(layoutManager);
 
 

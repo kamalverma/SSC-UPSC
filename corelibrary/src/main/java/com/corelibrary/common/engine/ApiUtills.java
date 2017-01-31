@@ -21,5 +21,9 @@ public interface ApiUtills {
 
     @FormUrlEncoded
     @POST("/rest/v1/questions")
-    Call<QuestionResponse> getQuestionList(@Field("cat_id") int catId);
+    Call<QuestionResponse> getQuestionList(@Field("catId") int catId);
+
+    @FormUrlEncoded
+    @POST("/rest/v1/questions/topRated")
+    Call<QuestionResponse> getMixQuestionList();
 }

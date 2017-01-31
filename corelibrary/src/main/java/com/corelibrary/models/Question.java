@@ -2,10 +2,13 @@ package com.corelibrary.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kamalverma on 27/01/17.
@@ -14,7 +17,6 @@ import java.io.Serializable;
 @DatabaseTable(tableName = "questions")
 public class Question implements Serializable {
 
-    @SerializedName("qn_text")
     @DatabaseField
     private String qnText;
 
@@ -25,32 +27,23 @@ public class Question implements Serializable {
     private String tags;
     @DatabaseField
     private String explanation;
-    @DatabaseField
-    private String opt1;
-    @DatabaseField
-    private String opt2;
-    @DatabaseField
-    private String opt3;
-    @DatabaseField
-    private String opt4;
-    @DatabaseField
-    private String opt5;
-    @DatabaseField
-    private String opt6;
+
+
+    @DatabaseField(dataType = DataType.SERIALIZABLE)
+    private String[] opts;
+
 
     @SerializedName("ans")
     @DatabaseField
-    private String answer;
+    private int answer;
     @DatabaseField
     private int catId;
 
-    @SerializedName("question_id")
     @DatabaseField
     private int questionId;
 
-    @Expose(serialize = false, deserialize = false)
     @DatabaseField
-    private String externalLink;
+    private String extLink;
 
     @Expose(serialize = false, deserialize = false)
     @DatabaseField
@@ -66,11 +59,11 @@ public class Question implements Serializable {
 
     @Expose(serialize = false, deserialize = false)
     @DatabaseField
-    private String c_date; //Date of creation
+    private String cDate; //Date of creation
 
     @Expose(serialize = false, deserialize = false)
     @DatabaseField
-    private String m_date;  //Date of modification/attempted
+    private String mDate;  //Date of modification/attempted
 
 
     public Question() {
@@ -101,59 +94,12 @@ public class Question implements Serializable {
         this.explanation = explanation;
     }
 
-    public String getOpt1() {
-        return opt1;
-    }
 
-    public void setOpt1(String opt1) {
-        this.opt1 = opt1;
-    }
-
-    public String getOpt2() {
-        return opt2;
-    }
-
-    public void setOpt2(String opt2) {
-        this.opt2 = opt2;
-    }
-
-    public String getOpt3() {
-        return opt3;
-    }
-
-    public void setOpt3(String opt3) {
-        this.opt3 = opt3;
-    }
-
-    public String getOpt4() {
-        return opt4;
-    }
-
-    public void setOpt4(String opt4) {
-        this.opt4 = opt4;
-    }
-
-    public String getOpt5() {
-        return opt5;
-    }
-
-    public void setOpt5(String opt5) {
-        this.opt5 = opt5;
-    }
-
-    public String getOpt6() {
-        return opt6;
-    }
-
-    public void setOpt6(String opt6) {
-        this.opt6 = opt6;
-    }
-
-    public String getAnswer() {
+    public int getAnswer() {
         return answer;
     }
 
-    public void setAnswer(String answer) {
+    public void setAnswer(int answer) {
         this.answer = answer;
     }
 
@@ -175,11 +121,11 @@ public class Question implements Serializable {
 
 
     public String getExternalLink() {
-        return externalLink;
+        return extLink;
     }
 
     public void setExternalLink(String externalLink) {
-        this.externalLink = externalLink;
+        this.extLink = externalLink;
     }
 
     public boolean isAttempted() {
@@ -207,18 +153,63 @@ public class Question implements Serializable {
     }
 
     public String getC_date() {
-        return c_date;
+        return cDate;
     }
 
     public void setC_date(String c_date) {
-        this.c_date = c_date;
+        this.cDate = c_date;
     }
 
     public String getM_date() {
-        return m_date;
+        return mDate;
     }
 
     public void setM_date(String m_date) {
-        this.m_date = m_date;
+        this.mDate = m_date;
+    }
+
+
+    public String getQnType() {
+        return qnType;
+    }
+
+    public void setQnType(String qnType) {
+        this.qnType = qnType;
+    }
+
+    public String[] getOpts() {
+        return opts;
+    }
+
+    public void setOpts(String[] opts) {
+        this.opts = opts;
+    }
+
+    public String getExtLink() {
+        return extLink;
+    }
+
+    public void setExtLink(String extLink) {
+        this.extLink = extLink;
+    }
+
+    public String getcDate() {
+        return cDate;
+    }
+
+    public void setcDate(String cDate) {
+        this.cDate = cDate;
+    }
+
+    public String getmDate() {
+        return mDate;
+    }
+
+    public void setmDate(String mDate) {
+        this.mDate = mDate;
+    }
+
+
+    public class SerializedList<E> extends ArrayList<E> implements Serializable {
     }
 }
