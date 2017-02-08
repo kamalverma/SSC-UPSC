@@ -40,8 +40,8 @@ public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseS
         getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, subjectFragment, ChooseSubjectFragment.TAG).commit();
 
 
-        HomePageFragment homePageFragment = HomePageFragment.getInstance();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fl_app_view, homePageFragment, HomePageFragment.TAG).commit();
+//        HomePageFragment homePageFragment = HomePageFragment.getInstance();
+//        getSupportFragmentManager().beginTransaction().replace(R.id.fl_app_view, homePageFragment, HomePageFragment.TAG).commit();
 
     }
 
@@ -67,5 +67,11 @@ public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseS
         Intent intent = new Intent(this, QuestionBySubjectActivity.class);
         intent.putExtra(AppConstants.CATEGORY, subject);
         startActivity(intent);
+    }
+
+    @Override
+    public void onQuizSelected(Subject subject) {
+        //Create quiz and start from here
+
     }
 }

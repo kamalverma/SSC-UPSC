@@ -2,14 +2,13 @@ package com.corelibrary.fragments;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,9 +77,9 @@ public class ChooseSubjectFragment extends Fragment {
         RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_subjects);
         rvSubjects.setHasFixedSize(true);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 1);
 
-        layoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
+        layoutManager.setOrientation(GridLayoutManager.VERTICAL);
         rvSubjects.setLayoutManager(layoutManager);
 
 
@@ -112,28 +111,42 @@ public class ChooseSubjectFragment extends Fragment {
         @Override
         public void onBindViewHolder(SubjectViewHolder holder, int position) {
             holder.tvSubject.setText(listSubjects.get(position).getCatName());
-            holder.itemView.setTag(listSubjects.get(position));
+            holder.btnLearn.setTag(listSubjects.get(position));
+            holder.btnTakeQuiz.setTag(listSubjects.get(position));
         }
     }
 
     public class SubjectViewHolder extends RecyclerView.ViewHolder {
 
         public AppCompatTextView tvSubject;
-        public AppCompatTextView tvSubjectDesc;
+        public AppCompatButton btnLearn, btnTakeQuiz;
 
         public SubjectViewHolder(View itemView) {
             super(itemView);
 
             tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
-            tvSubjectDesc = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_desc);
+            btnLearn = (AppCompatButton) itemView.findViewById(R.id.tv_study);
+            btnTakeQuiz = (AppCompatButton) itemView.findViewById(R.id.tv_quiz);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+
+            btnLearn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     Subject subject = (Subject) v.getTag();
                     if (mListener != null) {
                         mListener.onSubjectSelected(subject);
+                    }
+                }
+            });
+
+            btnTakeQuiz.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Subject subject = (Subject) v.getTag();
+                    if (mListener != null) {
+                        mListener.onQuizSelected(subject);
                     }
                 }
             });
@@ -166,9 +179,10 @@ public class ChooseSubjectFragment extends Fragment {
             @Override
             public void onResponse(Call<SubjectResponse> call, Response<SubjectResponse> response) {
                 listSubjects = response.body().getCategories();
-
                 mAdapter.notifyDataSetChanged();
 
+
+                //Save all subjects in local database
                 for (Subject subject : listSubjects) {
                     dbSubjects.create(subject);
                 }
@@ -198,6 +212,8 @@ public class ChooseSubjectFragment extends Fragment {
 
     public interface CallBacks {
         void onSubjectSelected(Subject subject);
+
+        void onQuizSelected(Subject subject);
     }
 
 
