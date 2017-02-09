@@ -1,6 +1,5 @@
 package com.corelibrary.fragments;
 
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,12 +110,33 @@ public class QuestionFragment extends Fragment {
     }
 
 
-    public class QuestionAdapter extends RecyclerView.Adapter<QuestionViewHolder> {
+    public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+
+        private static final int VIEW_TYPE_MCQ = 1;
+        private static final int VIEW_TYPE_QUICK_TIP = 2;
+        private static final int VIEW_TYPE_ARTICAL = 3;
 
         @Override
-        public QuestionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View row = getActivity().getLayoutInflater().inflate(R.layout.row_question_mcq, parent, false);
-            return new QuestionViewHolder(row);
+        public int getItemViewType(int position) {
+            return VIEW_TYPE_MCQ;
+        }
+
+
+        @Override
+        public long getItemId(int position) {
+            return super.getItemId(position);
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View row = null;
+            if (viewType == VIEW_TYPE_MCQ) {
+                row = getActivity().getLayoutInflater().inflate(R.layout.row_question_mcq, parent, false);
+                return new MCQViewHolder(row);
+            }
+
+            return new MCQViewHolder(row);
         }
 
         @Override
@@ -124,23 +145,30 @@ public class QuestionFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(QuestionViewHolder holder, int position) {
-            holder.tvSubject.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-            for (String option : listQuestions.get(position).getOpts()) {
-                RadioButton radioButtonView = new RadioButton(getActivity());
-                radioButtonView.setText(Html.fromHtml(option));
-                holder.rgOptions.addView(radioButtonView);
+            if (holder instanceof MCQViewHolder) {
+
+                MCQViewHolder mcqViewHolder = (MCQViewHolder) holder;
+
+                mcqViewHolder.tvSubject.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
+                mcqViewHolder.rgOptions.removeAllViews();
+                for (String option : listQuestions.get(position).getOpts()) {
+                    RadioButton radioButtonView = new RadioButton(getActivity());
+                    radioButtonView.setText(Html.fromHtml(option));
+                    radioButtonView.setGravity(Gravity.CENTER_VERTICAL);
+                    mcqViewHolder.rgOptions.addView(radioButtonView);
+                }
             }
         }
     }
 
-    public class QuestionViewHolder extends RecyclerView.ViewHolder {
+    public class MCQViewHolder extends RecyclerView.ViewHolder {
 
         public AppCompatTextView tvSubject;
         public RadioGroup rgOptions;
 
-        public QuestionViewHolder(View itemView) {
+        public MCQViewHolder(View itemView) {
             super(itemView);
 
             tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
@@ -157,18 +185,47 @@ public class QuestionFragment extends Fragment {
         }
     }
 
-    public class VerticalSpaceItemDecoration extends RecyclerView.ItemDecoration {
+    public class QuickTipViewHolder extends RecyclerView.ViewHolder {
 
-        private final int verticalSpaceHeight;
+        public AppCompatTextView tvSubject;
+        public RadioGroup rgOptions;
 
-        public VerticalSpaceItemDecoration(int verticalSpaceHeight) {
-            this.verticalSpaceHeight = verticalSpaceHeight;
+        public QuickTipViewHolder(View itemView) {
+            super(itemView);
+
+            tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
+            rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Question question = (Question) v.getTag();
+
+                }
+            });
         }
+    }
 
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
-                                   RecyclerView.State state) {
-            outRect.bottom = verticalSpaceHeight;
+    public class ArticalViewHolder extends RecyclerView.ViewHolder {
+
+        public AppCompatTextView tvSubject;
+        public RadioGroup rgOptions;
+
+        public ArticalViewHolder(View itemView) {
+            super(itemView);
+
+            tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
+            rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Question question = (Question) v.getTag();
+
+                }
+            });
         }
     }
 
