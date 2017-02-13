@@ -56,6 +56,8 @@ public class QuestionFragment extends Fragment {
 
     private DbQuestions dbQuestions;
 
+    private AppCompatTextView mTvMore;
+
 
     public static QuestionFragment getInstance(Subject subject) {
 
@@ -90,7 +92,7 @@ public class QuestionFragment extends Fragment {
 
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
-        RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_questions);
+        final RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_questions);
         rvSubjects.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -98,6 +100,23 @@ public class QuestionFragment extends Fragment {
 
         rvSubjects.setLayoutManager(layoutManager);
 
+        mTvMore = (AppCompatTextView) view.findViewById(R.id.tv_more_data);
+        mTvMore.setVisibility(View.GONE);
+
+
+        mTvMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listQuestions = dbQuestions.getAllBySubject(subject.getCatId());
+
+                if (listQuestions.isEmpty()) {
+                    mAdapter.notifyDataSetChanged();
+                    rvSubjects.scrollToPosition(0);
+                }
+
+                mTvMore.setVisibility(View.GONE);
+            }
+        });
 
         mAdapter = new QuestionAdapter();
         rvSubjects.setAdapter(mAdapter);
@@ -105,8 +124,8 @@ public class QuestionFragment extends Fragment {
 
         if (listQuestions.isEmpty()) {
             mProgressBar.setVisibility(View.VISIBLE);
-            loadQuestions(subject.getCatId());
         }
+        loadQuestions(subject.getCatId());
         return view;
     }
 
@@ -272,16 +291,18 @@ public class QuestionFragment extends Fragment {
             public void onResponse(Call<QuestionResponse> call, Response<QuestionResponse> response) {
 
                 if (response.isSuccessful()) {
-                    listQuestions = response.body().getQuestions();
+                    List<Question> list = response.body().getQuestions();
 
-                    if (listQuestions.isEmpty()) {
-                        Toast.makeText(getActivity(), "No data found for this subject", Toast.LENGTH_LONG).show();
+                    if (list.isEmpty()) {
+                        if (listQuestions.isEmpty()) {
+                            Toast.makeText(getActivity(), "No data found for this subject", Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        mAdapter.notifyDataSetChanged();
-
-                        for (Question question : listQuestions) {
+                        for (Question question : list) {
                             dbQuestions.create(question);
                         }
+
+                        mTvMore.setVisibility(View.VISIBLE);
                     }
                 } else {
                     try {

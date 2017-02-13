@@ -29,8 +29,6 @@ public class DbQuestions {
         try {
             if (getByQuestionId(question.getQuestionId()) == null) {
                 return mQuestionDao.create(question);
-            } else {
-                mQuestionDao.update(question);
             }
         } catch (SQLException e) {
             e.printStackTrace();
