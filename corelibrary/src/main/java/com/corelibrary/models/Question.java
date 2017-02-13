@@ -20,6 +20,7 @@ public class Question implements Serializable {
     @DatabaseField
     private String qnText;
 
+
     @DatabaseField
     private String qnType;
 
@@ -64,6 +65,9 @@ public class Question implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @DatabaseField
     private String mDate;  //Date of modification/attempted
+
+
+    private String source;
 
 
     public Question() {
@@ -117,15 +121,6 @@ public class Question implements Serializable {
 
     public void setQuestionId(int questionId) {
         this.questionId = questionId;
-    }
-
-
-    public String getExternalLink() {
-        return extLink;
-    }
-
-    public void setExternalLink(String externalLink) {
-        this.extLink = externalLink;
     }
 
     public boolean isAttempted() {
@@ -209,6 +204,13 @@ public class Question implements Serializable {
         this.mDate = mDate;
     }
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
 
     public class SerializedList<E> extends ArrayList<E> implements Serializable {
     }

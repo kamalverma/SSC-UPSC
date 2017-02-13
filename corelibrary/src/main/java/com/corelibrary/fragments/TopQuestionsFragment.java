@@ -21,7 +21,7 @@ import com.corelibrary.R;
 import com.corelibrary.common.AppConstants;
 import com.corelibrary.common.database.DatabaseHelper;
 import com.corelibrary.common.database.DbQuestions;
-import com.corelibrary.common.engine.ApiUtills;
+import com.corelibrary.common.engine.ApiUtils;
 import com.corelibrary.common.engine.RetrofitClient;
 import com.corelibrary.models.Question;
 import com.corelibrary.models.QuestionResponse;
@@ -174,8 +174,8 @@ public class TopQuestionsFragment extends Fragment {
 
 
     public void loadQuestions(int catId) {
-        ApiUtills apiService =
-                RetrofitClient.getClient().create(ApiUtills.class);
+        ApiUtils apiService =
+                RetrofitClient.getClient().create(ApiUtils.class);
         Call<QuestionResponse> call = apiService.getQuestionList(catId);
 
         call.enqueue(new Callback<QuestionResponse>() {

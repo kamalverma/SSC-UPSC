@@ -3,6 +3,7 @@ package com.corelibrary.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +22,7 @@ import com.corelibrary.R;
 import com.corelibrary.common.AppConstants;
 import com.corelibrary.common.database.DatabaseHelper;
 import com.corelibrary.common.database.DbQuestions;
-import com.corelibrary.common.engine.ApiUtills;
+import com.corelibrary.common.engine.ApiUtils;
 import com.corelibrary.common.engine.RetrofitClient;
 import com.corelibrary.models.Question;
 import com.corelibrary.models.QuestionResponse;
@@ -115,10 +116,18 @@ public class QuestionFragment extends Fragment {
 
         private static final int VIEW_TYPE_MCQ = 1;
         private static final int VIEW_TYPE_QUICK_TIP = 2;
-        private static final int VIEW_TYPE_ARTICAL = 3;
+        private static final int VIEW_TYPE_ARTICLE = 3;
 
         @Override
         public int getItemViewType(int position) {
+
+            if (listQuestions.get(position).getQnType().equalsIgnoreCase("MCQ")) {
+                return VIEW_TYPE_MCQ;
+            } else if (listQuestions.get(position).getQnType().equalsIgnoreCase("SQ")) {
+                return VIEW_TYPE_QUICK_TIP;
+            } else if (listQuestions.get(position).getQnType().equalsIgnoreCase("ARTICLE")) {
+                return VIEW_TYPE_ARTICLE;
+            }
             return VIEW_TYPE_MCQ;
         }
 
@@ -134,6 +143,12 @@ public class QuestionFragment extends Fragment {
             if (viewType == VIEW_TYPE_MCQ) {
                 row = getActivity().getLayoutInflater().inflate(R.layout.row_question_mcq, parent, false);
                 return new MCQViewHolder(row);
+            } else if (viewType == VIEW_TYPE_QUICK_TIP) {
+                row = getActivity().getLayoutInflater().inflate(R.layout.row_question_quick_tip, parent, false);
+                return new QuickTipViewHolder(row);
+            } else if (viewType == VIEW_TYPE_ARTICLE) {
+                row = getActivity().getLayoutInflater().inflate(R.layout.row_article, parent, false);
+                return new ArticleViewHolder(row);
             }
 
             return new MCQViewHolder(row);
@@ -159,6 +174,24 @@ public class QuestionFragment extends Fragment {
                     radioButtonView.setGravity(Gravity.CENTER_VERTICAL);
                     mcqViewHolder.rgOptions.addView(radioButtonView);
                 }
+            } else if (holder instanceof QuickTipViewHolder) {
+
+                QuickTipViewHolder quickTipViewHolder = (QuickTipViewHolder) holder;
+                quickTipViewHolder.tvAnswer.setText(Html.fromHtml(listQuestions.get(position).getExplanation()));
+                quickTipViewHolder.tvQuestion.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
+
+            } else if (holder instanceof ArticleViewHolder) {
+
+                ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
+                articleViewHolder.tvTitle.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
+                articleViewHolder.tvPreview.setText(Html.fromHtml(listQuestions.get(position).getExplanation()));
+
+                if (listQuestions.get(position).getSource() != null && listQuestions.get(position).getSource().length() > 0) {
+                    articleViewHolder.tvSource.setText(listQuestions.get(position).getSource());//TODO add source for article in question model and backend
+                } else {
+                    articleViewHolder.tvSource.setText("Not Available");
+                }
+
             }
         }
     }
@@ -187,14 +220,13 @@ public class QuestionFragment extends Fragment {
 
     public class QuickTipViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject;
-        public RadioGroup rgOptions;
+        public AppCompatTextView tvQuestion, tvAnswer;
 
         public QuickTipViewHolder(View itemView) {
             super(itemView);
 
-            tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
-            rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
+            tvQuestion = (AppCompatTextView) itemView.findViewById(R.id.tv_question);
+            tvAnswer = (AppCompatTextView) itemView.findViewById(R.id.tv_answer);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -207,23 +239,23 @@ public class QuestionFragment extends Fragment {
         }
     }
 
-    public class ArticalViewHolder extends RecyclerView.ViewHolder {
+    public class ArticleViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject;
-        public RadioGroup rgOptions;
+        public AppCompatTextView tvTitle, tvPreview, tvSource;
+        public AppCompatButton btnReadMore;
 
-        public ArticalViewHolder(View itemView) {
+        public ArticleViewHolder(View itemView) {
             super(itemView);
 
-            tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
-            rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
+            tvTitle = (AppCompatTextView) itemView.findViewById(R.id.tv_article_title);
+            tvPreview = (AppCompatTextView) itemView.findViewById(R.id.tv_article_preview);
+            tvSource = (AppCompatTextView) itemView.findViewById(R.id.tv_source);
+            btnReadMore = (AppCompatButton) itemView.findViewById(R.id.btn_read_more);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     Question question = (Question) v.getTag();
-
                 }
             });
         }
@@ -231,8 +263,8 @@ public class QuestionFragment extends Fragment {
 
 
     public void loadQuestions(int catId) {
-        ApiUtills apiService =
-                RetrofitClient.getClient().create(ApiUtills.class);
+        ApiUtils apiService =
+                RetrofitClient.getClient().create(ApiUtils.class);
         Call<QuestionResponse> call = apiService.getQuestionList(catId);
 
         call.enqueue(new Callback<QuestionResponse>() {

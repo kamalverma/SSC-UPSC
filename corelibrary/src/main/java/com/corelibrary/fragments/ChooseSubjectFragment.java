@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import com.corelibrary.R;
 import com.corelibrary.common.database.DatabaseHelper;
 import com.corelibrary.common.database.DbSubjects;
-import com.corelibrary.common.engine.ApiUtills;
+import com.corelibrary.common.engine.ApiUtils;
 import com.corelibrary.common.engine.RetrofitClient;
 import com.corelibrary.models.Subject;
 import com.corelibrary.models.SubjectResponse;
@@ -170,8 +170,8 @@ public class ChooseSubjectFragment extends Fragment {
 
 
     public void loadSubjects() {
-        ApiUtills apiService =
-                RetrofitClient.getClient().create(ApiUtills.class);
+        ApiUtils apiService =
+                RetrofitClient.getClient().create(ApiUtils.class);
         Call<SubjectResponse> call = apiService.getSubjectList("prepup");
 
 
