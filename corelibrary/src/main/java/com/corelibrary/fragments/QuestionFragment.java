@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -187,12 +188,23 @@ public class QuestionFragment extends Fragment {
 
                 mcqViewHolder.tvSubject.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
                 mcqViewHolder.rgOptions.removeAllViews();
+
                 for (String option : listQuestions.get(position).getOpts()) {
-                    RadioButton radioButtonView = new RadioButton(getActivity());
-                    radioButtonView.setText(Html.fromHtml(option));
+                    AppCompatRadioButton radioButtonView = new AppCompatRadioButton(getActivity());
                     radioButtonView.setGravity(Gravity.CENTER_VERTICAL);
+
+                    radioButtonView.setText(Html.fromHtml(option).toString().trim());
+
                     mcqViewHolder.rgOptions.addView(radioButtonView);
                 }
+
+                mcqViewHolder.rgOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                    }
+                });
+
             } else if (holder instanceof QuickTipViewHolder) {
 
                 QuickTipViewHolder quickTipViewHolder = (QuickTipViewHolder) holder;
