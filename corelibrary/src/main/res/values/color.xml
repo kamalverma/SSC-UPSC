@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="right_answer_color">#70c134</color>
+    <color name="wrong_answer_color">#bc150f</color>
+    <color name="cancel_color">#de4927</color>
+</resources>

@@ -1,8 +1,14 @@
 package com.corelibrary.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +27,7 @@ import com.corelibrary.R;
 import com.corelibrary.common.AppConstants;
 import com.corelibrary.common.database.DatabaseHelper;
 import com.corelibrary.common.database.DbQuestions;
-import com.corelibrary.common.engine.ApiUtills;
+import com.corelibrary.common.engine.ApiUtils;
 import com.corelibrary.common.engine.RetrofitClient;
 import com.corelibrary.models.Question;
 import com.corelibrary.models.QuestionResponse;
@@ -55,6 +61,9 @@ public class QuestionFragment extends Fragment {
 
     private DbQuestions dbQuestions;
 
+    private AppCompatTextView mTvMore;
+    private boolean mFromAdapter;
+
 
     public static QuestionFragment getInstance(Subject subject) {
 
@@ -87,9 +96,8 @@ public class QuestionFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_questions, null);
 
-
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
-        RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_questions);
+        final RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_questions);
         rvSubjects.setHasFixedSize(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -97,6 +105,23 @@ public class QuestionFragment extends Fragment {
 
         rvSubjects.setLayoutManager(layoutManager);
 
+        mTvMore = (AppCompatTextView) view.findViewById(R.id.tv_more_data);
+        mTvMore.setVisibility(View.GONE);
+
+
+        mTvMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listQuestions = dbQuestions.getAllBySubject(subject.getCatId());
+
+                if (listQuestions.isEmpty()) {
+                    mAdapter.notifyDataSetChanged();
+                    rvSubjects.scrollToPosition(0);
+                }
+
+                mTvMore.setVisibility(View.GONE);
+            }
+        });
 
         mAdapter = new QuestionAdapter();
         rvSubjects.setAdapter(mAdapter);
@@ -104,8 +129,8 @@ public class QuestionFragment extends Fragment {
 
         if (listQuestions.isEmpty()) {
             mProgressBar.setVisibility(View.VISIBLE);
-            loadQuestions(subject.getCatId());
         }
+        loadQuestions(subject.getCatId());
         return view;
     }
 
@@ -115,10 +140,18 @@ public class QuestionFragment extends Fragment {
 
         private static final int VIEW_TYPE_MCQ = 1;
         private static final int VIEW_TYPE_QUICK_TIP = 2;
-        private static final int VIEW_TYPE_ARTICAL = 3;
+        private static final int VIEW_TYPE_ARTICLE = 3;
 
         @Override
         public int getItemViewType(int position) {
+
+            if (listQuestions.get(position).getQnType().equalsIgnoreCase("MCQ")) {
+                return VIEW_TYPE_MCQ;
+            } else if (listQuestions.get(position).getQnType().equalsIgnoreCase("SQ")) {
+                return VIEW_TYPE_QUICK_TIP;
+            } else if (listQuestions.get(position).getQnType().equalsIgnoreCase("ARTICLE")) {
+                return VIEW_TYPE_ARTICLE;
+            }
             return VIEW_TYPE_MCQ;
         }
 
@@ -134,6 +167,12 @@ public class QuestionFragment extends Fragment {
             if (viewType == VIEW_TYPE_MCQ) {
                 row = getActivity().getLayoutInflater().inflate(R.layout.row_question_mcq, parent, false);
                 return new MCQViewHolder(row);
+            } else if (viewType == VIEW_TYPE_QUICK_TIP) {
+                row = getActivity().getLayoutInflater().inflate(R.layout.row_question_quick_tip, parent, false);
+                return new QuickTipViewHolder(row);
+            } else if (viewType == VIEW_TYPE_ARTICLE) {
+                row = getActivity().getLayoutInflater().inflate(R.layout.row_article, parent, false);
+                return new ArticleViewHolder(row);
             }
 
             return new MCQViewHolder(row);
@@ -153,48 +192,110 @@ public class QuestionFragment extends Fragment {
 
                 mcqViewHolder.tvSubject.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
                 mcqViewHolder.rgOptions.removeAllViews();
-                for (String option : listQuestions.get(position).getOpts()) {
-                    RadioButton radioButtonView = new RadioButton(getActivity());
-                    radioButtonView.setText(Html.fromHtml(option));
+
+                mcqViewHolder.rgOptions.setTag(position);
+                // for (String option : listQuestions.get(position).getOpts()) {
+
+                for (int i = 0; i < listQuestions.get(position).getOpts().length; i++) {
+
+                    String option = listQuestions.get(position).getOpts()[i];
+                    AppCompatRadioButton radioButtonView = new AppCompatRadioButton(getActivity());
                     radioButtonView.setGravity(Gravity.CENTER_VERTICAL);
-                    mcqViewHolder.rgOptions.addView(radioButtonView);
+
+                    radioButtonView.setText(Html.fromHtml(option).toString().trim());
+
+
+                    mcqViewHolder.rgOptions.addView(radioButtonView, new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT));
                 }
+
+                if (listQuestions.get(position).isAttempted()) {
+
+                    mFromAdapter = true;
+                    AppCompatRadioButton radioButton = (AppCompatRadioButton) mcqViewHolder.rgOptions.getChildAt(listQuestions.get(position).getUserAnswer());
+                    radioButton.setChecked(true);
+                    mcqViewHolder.tvResult.setVisibility(View.VISIBLE);
+                    if (listQuestions.get(position).getUserAnswer() == listQuestions.get(position).getAnswer()) {
+                        mcqViewHolder.tvResult.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.right_answer_color));
+                        mcqViewHolder.tvResult.setText("Right Answer");
+                    } else {
+                        String option = listQuestions.get(position).getOpts()[listQuestions.get(position).getAnswer()];
+                        mcqViewHolder.tvResult.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.wrong_answer_color));
+                        mcqViewHolder.tvResult.setText("Answer is " + Html.fromHtml(option).toString().trim());
+                    }
+                } else {
+                    mcqViewHolder.tvResult.setVisibility(View.GONE);
+                }
+
+            } else if (holder instanceof QuickTipViewHolder) {
+
+                QuickTipViewHolder quickTipViewHolder = (QuickTipViewHolder) holder;
+                quickTipViewHolder.tvAnswer.setText(Html.fromHtml(listQuestions.get(position).getExplanation()));
+                quickTipViewHolder.tvQuestion.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
+
+            } else if (holder instanceof ArticleViewHolder) {
+
+                ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
+                articleViewHolder.tvTitle.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
+                articleViewHolder.tvPreview.setText(Html.fromHtml(listQuestions.get(position).getExplanation()));
+
+                if (listQuestions.get(position).getSource() != null && listQuestions.get(position).getSource().length() > 0) {
+                    articleViewHolder.tvSource.setText(listQuestions.get(position).getSource());//TODO add source for article in question model and backend
+                } else {
+                    articleViewHolder.tvSource.setText("Not Available");
+                }
+
             }
         }
     }
 
     public class MCQViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject;
+        public AppCompatTextView tvSubject, tvResult;
         public RadioGroup rgOptions;
 
         public MCQViewHolder(View itemView) {
             super(itemView);
 
             tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
+            tvResult = (AppCompatTextView) itemView.findViewById(R.id.tv_result);
             rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            rgOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View v) {
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                    Question question = (Question) v.getTag();
+                    if (mFromAdapter) {
+                        mFromAdapter = false;
+                        return;
+                    }
+                    int pos = (int) group.getTag();
+                    listQuestions.get(pos).setAttempted(true);
+                    View radioButton = group.findViewById(checkedId);
+                    int index = group.indexOfChild(radioButton);
+                    listQuestions.get(pos).setUserAnswer(index);
+
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
 
                 }
             });
+
         }
     }
 
     public class QuickTipViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject;
-        public RadioGroup rgOptions;
+        public AppCompatTextView tvQuestion, tvAnswer;
 
         public QuickTipViewHolder(View itemView) {
             super(itemView);
 
-            tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
-            rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
+            tvQuestion = (AppCompatTextView) itemView.findViewById(R.id.tv_question);
+            tvAnswer = (AppCompatTextView) itemView.findViewById(R.id.tv_answer);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -207,23 +308,30 @@ public class QuestionFragment extends Fragment {
         }
     }
 
-    public class ArticalViewHolder extends RecyclerView.ViewHolder {
+    public class ArticleViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject;
-        public RadioGroup rgOptions;
+        public AppCompatTextView tvTitle, tvPreview, tvSource;
+        public AppCompatButton btnReadMore;
 
-        public ArticalViewHolder(View itemView) {
+        public ArticleViewHolder(View itemView) {
             super(itemView);
 
-            tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
-            rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
+            tvTitle = (AppCompatTextView) itemView.findViewById(R.id.tv_article_title);
+            tvPreview = (AppCompatTextView) itemView.findViewById(R.id.tv_article_preview);
+            tvSource = (AppCompatTextView) itemView.findViewById(R.id.tv_source);
+            btnReadMore = (AppCompatButton) itemView.findViewById(R.id.btn_read_more);
+
+            btnReadMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     Question question = (Question) v.getTag();
-
                 }
             });
         }
@@ -231,8 +339,8 @@ public class QuestionFragment extends Fragment {
 
 
     public void loadQuestions(int catId) {
-        ApiUtills apiService =
-                RetrofitClient.getClient().create(ApiUtills.class);
+        ApiUtils apiService =
+                RetrofitClient.getClient().create(ApiUtils.class);
         Call<QuestionResponse> call = apiService.getQuestionList(catId);
 
         call.enqueue(new Callback<QuestionResponse>() {
@@ -240,16 +348,18 @@ public class QuestionFragment extends Fragment {
             public void onResponse(Call<QuestionResponse> call, Response<QuestionResponse> response) {
 
                 if (response.isSuccessful()) {
-                    listQuestions = response.body().getQuestions();
+                    List<Question> list = response.body().getQuestions();
 
-                    if (listQuestions.isEmpty()) {
-                        Toast.makeText(getActivity(), "No data found for this subject", Toast.LENGTH_LONG).show();
+                    if (list.isEmpty()) {
+                        if (listQuestions.isEmpty()) {
+                            Toast.makeText(getActivity(), "No data found for this subject", Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        mAdapter.notifyDataSetChanged();
-
-                        for (Question question : listQuestions) {
+                        for (Question question : list) {
                             dbQuestions.create(question);
                         }
+
+                        mTvMore.setVisibility(View.VISIBLE);
                     }
                 } else {
                     try {
