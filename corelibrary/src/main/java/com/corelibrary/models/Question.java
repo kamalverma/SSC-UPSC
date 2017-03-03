@@ -37,6 +37,10 @@ public class Question implements Serializable {
     @SerializedName("ans")
     @DatabaseField
     private int answer;
+
+    @DatabaseField
+    private int userAnswer;
+
     @DatabaseField
     private int catId;
 
@@ -105,6 +109,14 @@ public class Question implements Serializable {
 
     public void setAnswer(int answer) {
         this.answer = answer;
+    }
+
+    public int getUserAnswer() {
+        return userAnswer;
+    }
+
+    public void setUserAnswer(int userAnswer) {
+        this.userAnswer = userAnswer;
     }
 
     public int getCatId() {

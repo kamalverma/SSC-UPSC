@@ -1,8 +1,12 @@
 package com.corelibrary.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
@@ -58,6 +62,7 @@ public class QuestionFragment extends Fragment {
     private DbQuestions dbQuestions;
 
     private AppCompatTextView mTvMore;
+    private boolean mFromAdapter;
 
 
     public static QuestionFragment getInstance(Subject subject) {
@@ -90,7 +95,6 @@ public class QuestionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_questions, null);
-
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar);
         final RecyclerView rvSubjects = (RecyclerView) view.findViewById(R.id.rv_questions);
@@ -189,21 +193,38 @@ public class QuestionFragment extends Fragment {
                 mcqViewHolder.tvSubject.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
                 mcqViewHolder.rgOptions.removeAllViews();
 
-                for (String option : listQuestions.get(position).getOpts()) {
+                mcqViewHolder.rgOptions.setTag(position);
+                // for (String option : listQuestions.get(position).getOpts()) {
+
+                for (int i = 0; i < listQuestions.get(position).getOpts().length; i++) {
+
+                    String option = listQuestions.get(position).getOpts()[i];
                     AppCompatRadioButton radioButtonView = new AppCompatRadioButton(getActivity());
                     radioButtonView.setGravity(Gravity.CENTER_VERTICAL);
 
                     radioButtonView.setText(Html.fromHtml(option).toString().trim());
 
-                    mcqViewHolder.rgOptions.addView(radioButtonView);
+
+                    mcqViewHolder.rgOptions.addView(radioButtonView, new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT));
                 }
 
-                mcqViewHolder.rgOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (listQuestions.get(position).isAttempted()) {
 
+                    mFromAdapter = true;
+                    AppCompatRadioButton radioButton = (AppCompatRadioButton) mcqViewHolder.rgOptions.getChildAt(listQuestions.get(position).getUserAnswer());
+                    radioButton.setChecked(true);
+                    mcqViewHolder.tvResult.setVisibility(View.VISIBLE);
+                    if (listQuestions.get(position).getUserAnswer() == listQuestions.get(position).getAnswer()) {
+                        mcqViewHolder.tvResult.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.right_answer_color));
+                        mcqViewHolder.tvResult.setText("Right Answer");
+                    } else {
+                        String option = listQuestions.get(position).getOpts()[listQuestions.get(position).getAnswer()];
+                        mcqViewHolder.tvResult.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.wrong_answer_color));
+                        mcqViewHolder.tvResult.setText("Answer is " + Html.fromHtml(option).toString().trim());
                     }
-                });
+                } else {
+                    mcqViewHolder.tvResult.setVisibility(View.GONE);
+                }
 
             } else if (holder instanceof QuickTipViewHolder) {
 
@@ -229,23 +250,40 @@ public class QuestionFragment extends Fragment {
 
     public class MCQViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject;
+        public AppCompatTextView tvSubject, tvResult;
         public RadioGroup rgOptions;
 
         public MCQViewHolder(View itemView) {
             super(itemView);
 
             tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
+            tvResult = (AppCompatTextView) itemView.findViewById(R.id.tv_result);
             rgOptions = (RadioGroup) itemView.findViewById(R.id.options);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            rgOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View v) {
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                    Question question = (Question) v.getTag();
+                    if (mFromAdapter) {
+                        mFromAdapter = false;
+                        return;
+                    }
+                    int pos = (int) group.getTag();
+                    listQuestions.get(pos).setAttempted(true);
+                    View radioButton = group.findViewById(checkedId);
+                    int index = group.indexOfChild(radioButton);
+                    listQuestions.get(pos).setUserAnswer(index);
+
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    });
 
                 }
             });
+
         }
     }
 
@@ -282,6 +320,13 @@ public class QuestionFragment extends Fragment {
             tvPreview = (AppCompatTextView) itemView.findViewById(R.id.tv_article_preview);
             tvSource = (AppCompatTextView) itemView.findViewById(R.id.tv_source);
             btnReadMore = (AppCompatButton) itemView.findViewById(R.id.btn_read_more);
+
+            btnReadMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
