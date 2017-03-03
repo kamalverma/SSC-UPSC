@@ -1,12 +1,10 @@
 package com.corelibrary.fragments;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatTextView;
@@ -19,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -114,7 +111,7 @@ public class QuestionFragment extends Fragment {
             public void onClick(View v) {
                 listQuestions = dbQuestions.getAllBySubject(subject.getCatId());
 
-                if (listQuestions.isEmpty()) {
+                if (!listQuestions.isEmpty()) {
                     mAdapter.notifyDataSetChanged();
                     rvSubjects.scrollToPosition(0);
                 }
@@ -358,8 +355,12 @@ public class QuestionFragment extends Fragment {
                         for (Question question : list) {
                             dbQuestions.create(question);
                         }
-
-                        mTvMore.setVisibility(View.VISIBLE);
+                        if (listQuestions.isEmpty()) {
+                            listQuestions = dbQuestions.getAllBySubject(subject.getCatId());
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            mTvMore.setVisibility(View.VISIBLE);
+                        }
                     }
                 } else {
                     try {
@@ -368,7 +369,6 @@ public class QuestionFragment extends Fragment {
                         e.printStackTrace();
                     }
                 }
-
                 mProgressBar.setVisibility(View.GONE);
             }
 
