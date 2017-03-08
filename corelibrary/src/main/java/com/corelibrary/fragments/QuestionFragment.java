@@ -1,5 +1,6 @@
 package com.corelibrary.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.corelibrary.R;
+import com.corelibrary.WebViewActivity;
 import com.corelibrary.common.AppConstants;
 import com.corelibrary.common.database.DatabaseHelper;
 import com.corelibrary.common.database.DbQuestions;
@@ -113,7 +115,7 @@ public class QuestionFragment extends Fragment {
 
                 if (!listQuestions.isEmpty()) {
                     mAdapter.notifyDataSetChanged();
-                    rvSubjects.scrollToPosition(0);
+                    rvSubjects.smoothScrollToPosition(0);
                 }
 
                 mTvMore.setVisibility(View.GONE);
@@ -231,6 +233,8 @@ public class QuestionFragment extends Fragment {
 
             } else if (holder instanceof ArticleViewHolder) {
 
+                holder.itemView.setTag(listQuestions.get(position));
+                ((ArticleViewHolder) holder).btnReadMore.setTag(listQuestions.get(position));
                 ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
                 articleViewHolder.tvTitle.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
                 articleViewHolder.tvPreview.setText(Html.fromHtml(listQuestions.get(position).getExplanation()));
@@ -245,12 +249,12 @@ public class QuestionFragment extends Fragment {
         }
     }
 
-    public class MCQViewHolder extends RecyclerView.ViewHolder {
+    private class MCQViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvSubject, tvResult;
-        public RadioGroup rgOptions;
+        private AppCompatTextView tvSubject, tvResult;
+        private RadioGroup rgOptions;
 
-        public MCQViewHolder(View itemView) {
+        private MCQViewHolder(View itemView) {
             super(itemView);
 
             tvSubject = (AppCompatTextView) itemView.findViewById(R.id.tv_subject_name);
@@ -284,33 +288,25 @@ public class QuestionFragment extends Fragment {
         }
     }
 
-    public class QuickTipViewHolder extends RecyclerView.ViewHolder {
+    private class QuickTipViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvQuestion, tvAnswer;
+        private AppCompatTextView tvQuestion, tvAnswer;
 
-        public QuickTipViewHolder(View itemView) {
+        private QuickTipViewHolder(View itemView) {
             super(itemView);
 
             tvQuestion = (AppCompatTextView) itemView.findViewById(R.id.tv_question);
             tvAnswer = (AppCompatTextView) itemView.findViewById(R.id.tv_answer);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Question question = (Question) v.getTag();
-
-                }
-            });
         }
     }
 
-    public class ArticleViewHolder extends RecyclerView.ViewHolder {
+    private class ArticleViewHolder extends RecyclerView.ViewHolder {
 
-        public AppCompatTextView tvTitle, tvPreview, tvSource;
-        public AppCompatButton btnReadMore;
+        private AppCompatTextView tvTitle, tvPreview, tvSource;
+        private AppCompatButton btnReadMore;
 
-        public ArticleViewHolder(View itemView) {
+        private ArticleViewHolder(View itemView) {
             super(itemView);
 
             tvTitle = (AppCompatTextView) itemView.findViewById(R.id.tv_article_title);
@@ -321,7 +317,9 @@ public class QuestionFragment extends Fragment {
             btnReadMore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Question question = (Question) v.getTag();
 
+                    loadArticle(question);
                 }
             });
 
@@ -329,8 +327,24 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Question question = (Question) v.getTag();
+                    loadArticle(question);
+
+
                 }
             });
+        }
+
+
+        private void loadArticle(Question question) {
+            Intent intent = new Intent(getActivity(), WebViewActivity.class);
+
+            if (!question.getExplanation().isEmpty()) {
+                intent.putExtra(AppConstants.CONTENT, question.getExplanation());
+            } else {
+                intent.putExtra(AppConstants.URL, question.getExtLink());
+            }
+            startActivity(intent);
+            getActivity().overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         }
     }
 

@@ -8,7 +8,11 @@
         android:supportsRtl="true">
         <service
             android:name=".common.engine.DataService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity
+            android:name=".WebViewActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

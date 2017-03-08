@@ -6,4 +6,6 @@ package com.corelibrary.common;
 
 public interface AppConstants {
     String CATEGORY = "CATEGORY";
+    String CONTENT = "CONTENT";
+    String URL = "URL";
 }
