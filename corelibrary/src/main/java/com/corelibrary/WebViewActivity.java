@@ -3,6 +3,7 @@ package com.corelibrary;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -49,7 +50,7 @@ public class WebViewActivity extends AppCompatActivity {
 
             try {
                 mWebView.loadDataWithBaseURL("", "<style>img{display: inline;height: auto;max-width: 100%;} " +
-                        "table {display: inline;border: 1px solid black; max-width: 100%;}</style>" + mContent, "text/html", "UTF-8", null);
+                        "table {display: inline;border: 1px solid black; max-width: 100%;}</style>" + Html.fromHtml(mContent), "text/html", "UTF-8", null);
             } catch (OutOfMemoryError error) {
 
             }

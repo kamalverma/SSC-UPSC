@@ -73,6 +73,18 @@ public class Question implements Serializable {
 
     private String source;
 
+    @Expose(serialize = false, deserialize = false)
+    @DatabaseField
+    private String previewText;
+
+    public String getPreviewText() {
+        return previewText;
+    }
+
+    public void setPreviewText(String previewText) {
+        this.previewText = previewText;
+    }
+
 
     public Question() {
     }
