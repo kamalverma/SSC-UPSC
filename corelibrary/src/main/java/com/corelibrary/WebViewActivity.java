@@ -36,13 +36,22 @@ public class WebViewActivity extends AppCompatActivity {
 
         mWebView = (WebView) findViewById(R.id.webView);
 
+        WebSettings webViewSettings = mWebView.getSettings();
+        webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webViewSettings.setJavaScriptEnabled(true);
+        webViewSettings.setSupportZoom(false);
+        webViewSettings.setBuiltInZoomControls(false);
+        webViewSettings.setPluginState(WebSettings.PluginState.ON);
+        webViewSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+
 
         if (getIntent().getExtras().containsKey(AppConstants.CONTENT)) {
             mContent = getIntent().getExtras().getString(AppConstants.CONTENT);
 
 
             try {
-                mWebView.loadDataWithBaseURL(null, Html.fromHtml(mContent).toString(), "text/html", "utf-8", null);
+                mWebView.loadDataWithBaseURL(null, "<style>img{display: inline;height: auto;max-width: 100%;} " +
+                        "table {display: inline; max-width: 100%;}</style>" + Html.fromHtml(mContent).toString(), "text/html", "utf-8", null);
             } catch (OutOfMemoryError error) {
 
             }
