@@ -16,9 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activitiy.ChooseSubjectsActivity"></activity>
-        <activity android:name=".activitiy.QuestionBySubjectActivity"></activity>
-        <activity android:name=".activitiy.SignUpLoginActivity"></activity>
+        <activity android:name=".activitiy.ChooseSubjectsActivity" />
+        <activity android:name=".activitiy.QuestionBySubjectActivity" />
+        <activity android:name=".activitiy.SignUpLoginActivity" />
 
 
     </application>

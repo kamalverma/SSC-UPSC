@@ -237,8 +237,9 @@ public class QuestionFragment extends Fragment {
                 ((ArticleViewHolder) holder).btnReadMore.setTag(listQuestions.get(position));
                 ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
                 articleViewHolder.tvTitle.setText(Html.fromHtml(listQuestions.get(position).getQnText()));
-                articleViewHolder.tvPreview.setText(Html.fromHtml(listQuestions.get(position).getPreviewText()));
 
+                String strippedHTml = Html.fromHtml(listQuestions.get(position).getExplanation()).toString();
+                articleViewHolder.tvPreview.setText(Html.fromHtml(strippedHTml));
                 if (listQuestions.get(position).getSource() != null && listQuestions.get(position).getSource().length() > 0) {
                     articleViewHolder.tvSource.setText(listQuestions.get(position).getSource());//TODO add source for article in question model and backend
                 } else {
