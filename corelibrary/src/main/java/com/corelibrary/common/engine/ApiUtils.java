@@ -23,6 +23,12 @@ public interface ApiUtils {
     @POST("/rest/v1/questions")
     Call<QuestionResponse> getQuestionList(@Field("catId") int catId);
 
+
+    @FormUrlEncoded
+    @POST("/rest/v1/questions")
+    Call<QuestionResponse> getQuizList(@Field("catId") int catId);
+
+
     @FormUrlEncoded
     @POST("/rest/v1/questions/topRated")
     Call<QuestionResponse> getMixQuestionList();

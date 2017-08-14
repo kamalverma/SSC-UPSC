@@ -72,6 +72,8 @@ public class ChooseSubjectsActivity extends AppCompatActivity implements ChooseS
     @Override
     public void onQuizSelected(Subject subject) {
         //Create quiz and start from here
-
+        Intent intent = new Intent(this, QuestionBySubjectActivity.class);
+        intent.putExtra(AppConstants.CATEGORY, subject);
+        startActivity(intent);
     }
 }
